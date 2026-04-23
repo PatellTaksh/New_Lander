@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - NewLander</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .profile-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
+        .form-group input, .form-group textarea {
+            padding: 14px 16px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8); font-size: 1rem; color: var(--text-main); outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); border-color: var(--primary); background: #fff;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; padding: 14px 24px; border-radius: 12px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3); }
+        .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><i class="fas fa-globe-americas"></i><span>NewLander</span></div>
+            <button class="mobile-close" id="closeSidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-compass"></i> <span>Home</span></a>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="profile.html" class="nav-item active"><i class="fas fa-user"></i> <span>Profile</span></a>
+            <a href="bookings.html" class="nav-item"><i class="fas fa-key"></i> <span>Bookings</span></a>
+            <a href="events.html" class="nav-item"><i class="fas fa-calendar-alt"></i> <span>Events</span></a>
+            <a href="community.html" class="nav-item"><i class="fas fa-users"></i> <span>Community</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button class="mobile-menu-btn" id="openSidebar"><i class="fas fa-bars"></i></button>
+            <div class="search-bar"></div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="avatar" id="headerInitials">U</div>
+                    <span class="user-name" id="headerName">Loading</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1>My Profile</h1>
+                <p>Manage your personal information and settings.</p>
+            </div>
+            
+            <div id="statusMessage" style="display:none; padding:16px 20px; border-radius:12px; margin-bottom:24px; font-weight:600; box-shadow:var(--shadow-sm);"></div>
+
+            <div class="content-grid" style="grid-template-columns: 1fr; max-width: 800px;">
+                <div class="dashboard-card glass-card">
+                    <div class="card-header">
+                        <h2>Personal Information</h2>
+                    </div>
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="profName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="profEmail" readonly style="background:#f1f5f9; color:#64748b; cursor:not-allowed;" title="Email cannot be changed">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="profPhone" placeholder="+1 234 567 8900">
+                        </div>
+                        <div class="form-group">
+                            <label>University</label>
+                            <input type="text" id="profUniversity" placeholder="e.g. Stanford University">
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                            <div class="form-group">
+                                <label>Current Country</label>
+                                <input type="text" id="profCurrentCountry">
+                            </div>
+                            <div class="form-group">
+                                <label>Destination Country</label>
+                                <input type="text" id="profDestinationCountry">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Bio</label>
+                            <textarea id="profBio" rows="4" placeholder="Tell the community a bit about yourself..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-save">Save Profile Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!Auth.isLoggedIn()) { window.location.href = "login.html"; return; }
+
+            const sidebar = document.getElementById('sidebar');
+            document.getElementById('openSidebar')?.addEventListener('click', () => sidebar.classList.add('active'));
+            document.getElementById('closeSidebar')?.addEventListener('click', () => sidebar.classList.remove('active'));
+            document.getElementById('logoutBtn')?.addEventListener('click', () => Auth.logout());
+
+            // Load profile data
+            try {
+                const response = await Auth.getProfile();
+                if(response && response.success) {
+                    const data = response.data;
+                    document.getElementById('profName').value = data.full_name || '';
+                    document.getElementById('profEmail').value = data.email || '';
+                    document.getElementById('profPhone').value = data.phone || '';
+                    document.getElementById('profUniversity').value = data.university || '';
+                    document.getElementById('profCurrentCountry').value = data.current_country || '';
+                    document.getElementById('profDestinationCountry').value = data.destination_country || '';
+                    document.getElementById('profBio').value = data.bio || '';
+
+                    const firstName = (data.full_name || "User").split(' ')[0];
+                    document.getElementById('headerName').textContent = firstName;
+                    document.getElementById('headerInitials').textContent = firstName.charAt(0).toUpperCase();
+                }
+            } catch(e) { console.error("Error loading profile", e); }
+
+            // Handle Save
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.textContent = "Saving..."; btn.disabled = true;
+
+                const reqBody = {
+                    full_name: document.getElementById('profName').value,
+                    phone: document.getElementById('profPhone').value,
+                    university: document.getElementById('profUniversity').value,
+                    current_country: document.getElementById('profCurrentCountry').value,
+                    destination_country: document.getElementById('profDestinationCountry').value,
+                    bio: document.getElementById('profBio').value
+                };
+
+                try {
+                    const res = await Auth.updateProfile(reqBody);
+                    const msgBox = document.getElementById('statusMessage');
+                    msgBox.style.display = 'block';
+                    if(res.success) {
+                        msgBox.textContent = "Profile updated successfully!";
+                        msgBox.style.background = "#d1fae5"; msgBox.style.color = "#065f46";
+                        msgBox.style.border = "1px solid #a7f3d0";
+                    } else {
+                        msgBox.textContent = res.message || "Failed to update profile";
+                        msgBox.style.background = "#fee2e2"; msgBox.style.color = "#991b1b";
+                        msgBox.style.border = "1px solid #fecaca";
+                    }
+                    setTimeout(() => { msgBox.style.display = 'none'; }, 5000);
+                } catch(err) {
+                    alert("Error saving profile");
+                } finally {
+                    btn.textContent = "Save Profile Settings"; btn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

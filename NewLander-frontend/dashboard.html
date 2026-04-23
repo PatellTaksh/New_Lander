@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NewLander</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-globe-americas"></i>
+                <span>NewLander</span>
+            </div>
+            <button class="mobile-close" id="closeSidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-compass"></i> <span>Home</span></a>
+            <a href="dashboard.html" class="nav-item active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> <span>Profile</span></a>
+            <a href="bookings.html" class="nav-item"><i class="fas fa-key"></i> <span>Bookings</span></a>
+            <a href="events.html" class="nav-item"><i class="fas fa-calendar-alt"></i> <span>Events</span></a>
+            <a href="community.html" class="nav-item"><i class="fas fa-users"></i> <span>Community</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        
+        <!-- Top Navigation -->
+        <header class="top-header">
+            <button class="mobile-menu-btn" id="openSidebar"><i class="fas fa-bars"></i></button>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search events, bookings, or community...">
+            </div>
+            <div class="header-right">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <div class="user-profile">
+                    <div class="avatar" id="headerInitials">...</div>
+                    <span class="user-name" id="headerName">Loading</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            
+            <div class="welcome-section">
+                <h1 id="welcomeMessage">Welcome back!</h1>
+                <p>Here's what's happening with your international journey today.</p>
+            </div>
+
+            <div id="errorBanner" class="error-banner" style="display: none;"></div>
+
+            <!-- Stats Overview Cards -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon purple"><i class="fas fa-bed"></i></div>
+                    <div class="stat-details">
+                        <p>Total Bookings</p>
+                        <h3 class="skeleton-text" id="statBookings"></h3>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-details">
+                        <p>Events Joined</p>
+                        <h3 class="skeleton-text" id="statEvents"></h3>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon green"><i class="fas fa-comment-dots"></i></div>
+                    <div class="stat-details">
+                        <p>Community Posts</p>
+                        <h3 class="skeleton-text" id="statPosts"></h3>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon orange"><i class="fas fa-heart"></i></div>
+                    <div class="stat-details">
+                        <p>Saved Listings</p>
+                        <h3 class="skeleton-text" id="statSavedAcc"></h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid Layout -->
+            <div class="content-grid">
+                
+                <!-- Left Column -->
+                <div class="left-col">
+                    
+                    <!-- Recent Bookings Section -->
+                    <div class="dashboard-card glass-card">
+                        <div class="card-header">
+                            <h2>Recent Bookings</h2>
+                            <a href="bookings.html" class="view-all">View All</a>
+                        </div>
+                        <div class="card-body" id="recentBookingsList">
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Events Section -->
+                    <div class="dashboard-card glass-card">
+                        <div class="card-header">
+                            <h2>Upcoming Events</h2>
+                            <a href="events.html" class="view-all">View All</a>
+                        </div>
+                        <div class="card-body" id="upcomingEventsList">
+                            <div class="skeleton-block"></div>
+                            <div class="skeleton-block"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-col">
+                    
+                    <!-- Profile Overview Card -->
+                    <div class="dashboard-card glass-card profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar" id="mainAvatar">...</div>
+                            <h2 id="fullName" class="skeleton-text-small"></h2>
+                            <p id="university" class="skeleton-text-small"></p>
+                        </div>
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span id="email" class="skeleton-text-small"></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-plane-departure"></i>
+                                <span>From: <strong id="currentCountry" class="skeleton-text-small"></strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>To: <strong id="destinationCountry" class="skeleton-text-small"></strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="phone" class="skeleton-text-small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Posts Section -->
+                    <div class="dashboard-card glass-card">
+                        <div class="card-header">
+                            <h2>My Recent Posts</h2>
+                            <a href="community.html" class="view-all">View All</a>
+                        </div>
+                        <div class="card-body" id="myPostsList">
+                            <div class="skeleton-block"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

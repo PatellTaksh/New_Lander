@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings - NewLander</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .bookings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .booking-card { padding: 24px; display: flex; flex-direction: column; gap: 16px; position:relative; overflow:hidden;}
+        .b-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .b-title { font-weight: 800; font-size: 1.15rem; color: var(--text-main); margin-bottom:4px;}
+        .b-loc { color: var(--text-muted); font-size: 0.9rem; display:flex; align-items:center; gap:6px;}
+        .b-details { background: rgba(255,255,255,0.6); padding: 16px; border-radius: 12px; font-size: 0.95rem; border:1px solid rgba(0,0,0,0.03);}
+        .b-details div { margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;}
+        .b-details div:last-child { margin-bottom: 0;}
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><i class="fas fa-globe-americas"></i><span>NewLander</span></div>
+            <button class="mobile-close" id="closeSidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-compass"></i> <span>Home</span></a>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> <span>Profile</span></a>
+            <a href="bookings.html" class="nav-item active"><i class="fas fa-key"></i> <span>Bookings</span></a>
+            <a href="events.html" class="nav-item"><i class="fas fa-calendar-alt"></i> <span>Events</span></a>
+            <a href="community.html" class="nav-item"><i class="fas fa-users"></i> <span>Community</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button class="mobile-menu-btn" id="openSidebar"><i class="fas fa-bars"></i></button>
+            <div class="search-bar"></div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="avatar" id="headerInitials">U</div>
+                    <span class="user-name" id="headerName">Loading</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1>My Bookings</h1>
+                <p>Manage your accommodation bookings and reservations.</p>
+            </div>
+            
+            <div id="bookingsList" class="bookings-grid">
+                <div class="skeleton-block" style="height: 250px;"></div>
+                <div class="skeleton-block" style="height: 250px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!Auth.isLoggedIn()) { window.location.href = "login.html"; return; }
+
+            const sidebar = document.getElementById('sidebar');
+            document.getElementById('openSidebar')?.addEventListener('click', () => sidebar.classList.add('active'));
+            document.getElementById('closeSidebar')?.addEventListener('click', () => sidebar.classList.remove('active'));
+            document.getElementById('logoutBtn')?.addEventListener('click', () => Auth.logout());
+
+            const user = Auth.getCurrentUser();
+            if(user) {
+                const firstName = (user.full_name || "User").split(' ')[0];
+                document.getElementById('headerName').textContent = firstName;
+                document.getElementById('headerInitials').textContent = firstName.charAt(0).toUpperCase();
+            }
+
+            try {
+                const res = await Auth.authenticatedRequest(`${API_BASE_URL}/bookings.php`);
+                const container = document.getElementById('bookingsList');
+                
+                if (res && res.success && res.data && res.data.length > 0) {
+                    container.innerHTML = res.data.map(b => `
+                        <div class="glass-card booking-card">
+                            <div class="b-header">
+                                <div>
+                                    <div class="b-title">${b.title || "Accommodation"}</div>
+                                    <div class="b-loc"><i class="fas fa-map-marker-alt"></i> ${b.city}, ${b.country}</div>
+                                </div>
+                                <span class="item-status status-${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span>
+                            </div>
+                            <div class="b-details">
+                                <div><span style="color:var(--text-muted)">Move in</span> <strong style="color:var(--text-main)">${b.move_in_date || 'N/A'}</strong></div>
+                                <div><span style="color:var(--text-muted)">Duration</span> <strong style="color:var(--text-main)">${b.duration_months} Months</strong></div>
+                                <div><span style="color:var(--text-muted)">Monthly Rent</span> <strong style="color:var(--text-main)">$${b.monthly_rent}</strong></div>
+                                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08)">
+                                    <span style="color:var(--text-muted); font-weight:600;">Total Amount</span> 
+                                    <strong style="color:var(--primary); font-size:1.2rem">$${b.total_amount}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `).join("");
+                } else {
+                    container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1; padding: 60px;">
+                        <i class="fas fa-building" style="font-size:4rem; color:#cbd5e1; margin-bottom:20px;"></i>
+                        <h3 style="color:var(--text-main); margin-bottom:8px;">No Bookings Found</h3>
+                        <p>You haven't booked any accommodations yet. Browse the home page to find places to stay.</p>
+                    </div>`;
+                }
+            } catch(e) {
+                console.error(e);
+                document.getElementById('bookingsList').innerHTML = `<div class="error-banner">Failed to load bookings. Please check your connection.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

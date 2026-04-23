@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - NewLander</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .community-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 32px;}
+        .btn-post { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 14px 28px; border-radius: 100px; font-weight: 600; font-size:1rem; cursor: pointer; transition: 0.2s; box-shadow:0 4px 12px rgba(79,70,229,0.3);}
+        .btn-post:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(79, 70, 229, 0.4); }
+        .posts-list { display: flex; flex-direction: column; gap: 24px; max-width: 850px; margin: 0 auto; }
+        .post-card { padding: 28px; }
+        .p-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px;}
+        .p-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+        .p-author { font-weight: 700; color: var(--text-main); font-size:1.05rem; margin-bottom:2px;}
+        .p-date { font-size: 0.85rem; color: var(--text-muted); font-weight:500;}
+        .p-content h3 { margin-bottom: 12px; color: var(--text-main); font-size:1.3rem; font-weight:800;}
+        .p-content p { color: var(--text-muted); line-height: 1.7; font-size:1rem;}
+        .p-footer { display: flex; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.06); }
+        .p-action { color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; display:flex; align-items:center; gap:8px; transition:0.2s; padding:8px 16px; border-radius:100px; background:rgba(0,0,0,0.03);}
+        .p-action:hover { color: var(--primary); background:rgba(79,70,229,0.1); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><i class="fas fa-globe-americas"></i><span>NewLander</span></div>
+            <button class="mobile-close" id="closeSidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-compass"></i> <span>Home</span></a>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> <span>Profile</span></a>
+            <a href="bookings.html" class="nav-item"><i class="fas fa-key"></i> <span>Bookings</span></a>
+            <a href="events.html" class="nav-item"><i class="fas fa-calendar-alt"></i> <span>Events</span></a>
+            <a href="community.html" class="nav-item active"><i class="fas fa-users"></i> <span>Community</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <button class="mobile-menu-btn" id="openSidebar"><i class="fas fa-bars"></i></button>
+            <div class="search-bar"></div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="avatar" id="headerInitials">U</div>
+                    <span class="user-name" id="headerName">Loading</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="community-header">
+                <div class="welcome-section" style="margin-bottom:0">
+                    <h1>Community Forum</h1>
+                    <p>Connect, ask questions, and share your journey abroad.</p>
+                </div>
+                <button class="btn-post" onclick="alert('Post creation modal coming soon!')"><i class="fas fa-pen"></i> Write a Post</button>
+            </div>
+            
+            <div id="postsList" class="posts-list">
+                <div class="skeleton-block" style="height: 180px;"></div>
+                <div class="skeleton-block" style="height: 180px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!Auth.isLoggedIn()) { window.location.href = "login.html"; return; }
+
+            const sidebar = document.getElementById('sidebar');
+            document.getElementById('openSidebar')?.addEventListener('click', () => sidebar.classList.add('active'));
+            document.getElementById('closeSidebar')?.addEventListener('click', () => sidebar.classList.remove('active'));
+            document.getElementById('logoutBtn')?.addEventListener('click', () => Auth.logout());
+
+            const user = Auth.getCurrentUser();
+            if(user) {
+                const firstName = (user.full_name || "User").split(' ')[0];
+                document.getElementById('headerName').textContent = firstName;
+                document.getElementById('headerInitials').textContent = firstName.charAt(0).toUpperCase();
+            }
+
+            async function loadPosts() {
+                try {
+                    const res = await Auth.authenticatedRequest(`${API_BASE_URL}/posts.php`);
+                    const container = document.getElementById('postsList');
+                    
+                    if (res && res.success && res.data && res.data.length > 0) {
+                        container.innerHTML = res.data.map(p => {
+                            const dateObj = new Date(p.created_at);
+                            const formattedDate = !isNaN(dateObj) ? dateObj.toLocaleDateString() : "Recently";
+                            return `
+                            <div class="glass-card post-card">
+                                <div class="p-header">
+                                    <div class="p-avatar">${(p.author_name || "U").charAt(0).toUpperCase()}</div>
+                                    <div>
+                                        <div class="p-author">${p.author_name || "Anonymous User"}</div>
+                                        <div class="p-date"><i class="far fa-clock"></i> ${formattedDate} &bull; <i class="fas fa-globe"></i> ${p.country || 'Global'}</div>
+                                    </div>
+                                </div>
+                                <div class="p-content">
+                                    <h3>${p.title}</h3>
+                                    <p>${p.content || "Join the conversation to read more."}</p>
+                                </div>
+                                <div class="p-footer">
+                                    <div class="p-action"><i class="far fa-heart"></i> ${p.likes || 0} Likes</div>
+                                    <div class="p-action"><i class="far fa-comment"></i> ${p.comments_count || 0} Comments</div>
+                                </div>
+                            </div>
+                        `}).join("");
+                    } else {
+                        container.innerHTML = `
+                        <div class="empty-state" style="padding:60px;">
+                            <i class="fas fa-comments" style="font-size:4rem; color:#cbd5e1; margin-bottom:20px;"></i>
+                            <h3 style="color:var(--text-main); margin-bottom:8px;">No Posts Available</h3>
+                            <p>Be the first to start a discussion in the community!</p>
+                        </div>`;
+                    }
+                } catch(e) {
+                    console.error(e);
+                    document.getElementById('postsList').innerHTML = `<div class="error-banner">Failed to load community posts.</div>`;
+                }
+            }
+
+            loadPosts();
+        });
+    </script>
+</body>
+</html>

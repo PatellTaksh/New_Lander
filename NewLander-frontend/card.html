@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Property Cards</title>
+    <link rel="stylesheet" href="card.css">
+</head>
+
+<body>
+
+    <div class="card-container">
+
+        <!-- PROPERTY CARD -->
+        <div class="property-card">
+            <div class="image-slider">
+                <div class="images">
+                    <img src="images/apt1-1.jpg" alt="Apartment image 1">
+                    <img src="images/apt1-2.jpg" alt="Apartment image 2">
+                    <img src="images/apt1-3.jpg" alt="Apartment image 3">
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>Modern Studio Apartment</h3>
+                <p class="location">📍 Manhattan, New York</p>
+                <p class="info">🛏 1 Bedroom | 🚿 1 Bathroom</p>
+                <p class="desc">Fully furnished studio near Columbia University</p>
+                <p class="price">$1200 / month</p>
+
+                <button class="view-btn" onclick="openDetails()">View Details</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DETAILS MODAL -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetails()">&times;</span>
+
+            <h2>Modern Studio Apartment</h2>
+            <p><strong>Location:</strong> Manhattan, New York</p>
+            <p><strong>Rent:</strong> $1200 / month</p>
+            <p><strong>Type:</strong> Fully Furnished Studio</p>
+            <p><strong>Nearby:</strong> Columbia University, Metro Station</p>
+
+            <h3>Description</h3>
+            <p>
+                This modern studio apartment offers natural lighting,
+                modular kitchen, high-speed internet, and 24/7 security.
+                Perfect for students and working professionals.
+            </p>
+
+            <h3>Amenities</h3>
+            <ul>
+                <li>✔ WiFi</li>
+                <li>✔ Air Conditioning</li>
+                <li>✔ Washing Machine</li>
+                <li>✔ Security</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="card.js"></script>
+</body>
+
+</html>
